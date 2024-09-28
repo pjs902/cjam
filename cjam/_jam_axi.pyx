@@ -163,26 +163,31 @@ def axi_rms(xp, yp, incl, lum_area, lum_sigma, lum_q, pot_area, pot_sigma, pot_q
 
 
 def axisymmetric(xp, yp, tracer_mge, potential_mge, distance, beta=0, kappa=0, nscale=1, mscale=1, incl=np.pi/2*u.rad, mbh=0*u.Msun, rbh=0*u.arcsec, nrad=30, nang=7, xaxis=True, yaxis=True, zaxis=True):
-    
+
     # make sure anisotropy and rotation arrays are the correct length
     beta = np.ones(len(tracer_mge))*beta
     kappa = np.ones(len(tracer_mge))*kappa
-    
+
     # copy MGEs so that changes we make here aren't propagated
     tracer_copy = tracer_mge.copy()
     potential_copy = potential_mge.copy()
-    
+
     # adjust tracer MGE by Nscale
     tracer_copy["i"] *= nscale
-    
+
     # adjust potential MGE by M/L
     potential_copy["i"] *= mscale
     
     # add BH to potential gaussian
     if mbh>0 and rbh>0:
         potential_copy.add_row()
-        potential_copy["i"][-1] = mbh/2/np.pi/(rbh*distance/u.rad).to("pc")**2
-        potential_copy["s"][-1] = rbh
+        mbh = mbh.to("Msun")
+        rbh = (rbh*distance/u.rad).to("pc")
+        area = 2*np.pi*rbh**2
+        surface_density = mbh/area
+        # update the last row of the potential MGE
+        potential_copy["i"][-1] = surface_density.to_value("Msun/pc**2")
+        potential_copy["s"][-1] = rbh.to_value("pc")
         potential_copy["q"][-1] = 1
         potential_copy.sort("s")
     
@@ -202,8 +207,8 @@ def axisymmetric(xp, yp, tracer_mge, potential_mge, distance, beta=0, kappa=0, n
             kappa,
             nrad,
             nang)
-    except:
-        print("CJAM first moments failed in axisymmetric.", flush=True)
+    except Exception as e:
+        print("CJAM first moments failed in axisymmetric: ", e, flush=True)
         return False
     
     # calculate second moments
@@ -224,8 +229,8 @@ def axisymmetric(xp, yp, tracer_mge, potential_mge, distance, beta=0, kappa=0, n
             xaxis=xaxis,
             yaxis=yaxis,
             zaxis=zaxis)
-    except:
-        print("CJAM second moments failed in axisymmetric.", flush=True)
+    except Exception as e:
+        print("CJAM second moments failed in axisymmetric.",e, flush=True)
         return False
     
     # put results into astropy table, also convert PMs to mas/yr
