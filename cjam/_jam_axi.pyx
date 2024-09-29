@@ -186,8 +186,9 @@ def axisymmetric(xp, yp, tracer_mge, potential_mge, distance, beta=0, kappa=0, n
         area = 2*np.pi*rbh**2
         surface_density = mbh/area
         # update the last row of the potential MGE
-        potential_copy["i"][-1] = surface_density.to_value("Msun/pc**2")
-        potential_copy["s"][-1] = rbh.to_value("pc")
+        potential_copy["i"][-1] = surface_density
+        # potential_copy["i"][-1] = surface_density.to_value("Msun/pc**2")
+        potential_copy["s"][-1] = rbh
         potential_copy["q"][-1] = 1
         potential_copy.sort("s")
     
