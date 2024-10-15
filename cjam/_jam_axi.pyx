@@ -164,6 +164,11 @@ def axi_rms(xp, yp, incl, lum_area, lum_sigma, lum_q, pot_area, pot_sigma, pot_q
 
 def axisymmetric(xp, yp, tracer_mge, potential_mge, distance, beta=0, kappa=0, nscale=1, mscale=1, incl=np.pi/2*u.rad, mbh=0*u.Msun, rbh=0*u.arcsec, nrad=30, nang=7, xaxis=True, yaxis=True, zaxis=True):
 
+
+    from gcfit.util.units import angular_width
+
+    u.set_enabled_equivalencies(angular_width(D=distance))
+
     # make sure anisotropy and rotation arrays are the correct length
     beta = np.ones(len(tracer_mge))*beta
     kappa = np.ones(len(tracer_mge))*kappa
@@ -186,9 +191,10 @@ def axisymmetric(xp, yp, tracer_mge, potential_mge, distance, beta=0, kappa=0, n
         area = 2*np.pi*rbh**2
         surface_density = mbh/area
         # update the last row of the potential MGE
-        potential_copy["i"][-1] = surface_density
-        # potential_copy["i"][-1] = surface_density.to_value("Msun/pc**2")
-        potential_copy["s"][-1] = rbh
+        # potential_copy["i"][-1] = surface_density
+        potential_copy["i"][-1] = surface_density.to_value("Msun/pc**2")
+        # potential_copy["s"][-1] = rbh
+        potential_copy["s"][-1] = rbh.to_value("pc")
         potential_copy["q"][-1] = 1
         potential_copy.sort("s")
     

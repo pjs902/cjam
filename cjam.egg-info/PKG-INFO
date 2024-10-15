@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: cjam
+Version: 0.1
+Summary: Jeans Anisotropic MGE models -- written in C with a Python wrapper.
+Home-page: https://github.com/lauralwatkins/cjam
+Author: Laura Watkins
+Author-email: lauralwatkins@gmail.com
+License-File: LICENSE.md
